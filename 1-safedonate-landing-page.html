@@ -1,0 +1,454 @@
+<div class="flex h-screen bg-slate-50 font-sans overflow-hidden">
+
+  <!-- GLOBAL:SIDEBAR -->
+  <div class="fixed left-0 top-0 h-screen w-64 bg-gradient-to-b from-emerald-900 via-emerald-800 to-emerald-900 text-white shadow-2xl flex flex-col z-50">
+    <!-- Logo Section -->
+    <div class="p-6 border-b border-emerald-700">
+      <div class="flex items-center gap-3">
+        <svg class="w-8 h-8" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2"/>
+          <path d="M16 8v8m-4-4h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M10 24c2-1 4-1.5 6-1.5s4 0.5 6 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <div>
+          <h1 class="text-lg font-bold tracking-tight">SafeDonate</h1>
+          <p class="text-xs text-emerald-300">Crowdfunding</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Items -->
+    <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2 [&::-webkit-scrollbar]:thin [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-emerald-700 [&::-webkit-scrollbar-thumb]:rounded-full" style="scrollbar-width: thin;">
+      <!-- Landing Page -->
+      <a href="/" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-emerald-700 text-white font-medium transition-all duration-200 hover:bg-emerald-600 active:scale-95">
+        <i class="fa-solid fa-home w-5"></i>
+        <span>Home</span>
+      </a>
+
+      <!-- Campaign Discovery -->
+      <a href="/campaigns" class="flex items-center gap-3 px-4 py-3 rounded-lg text-emerald-100 font-medium transition-all duration-200 hover:bg-emerald-700 hover:text-white">
+        <i class="fa-solid fa-magnifying-glass w-5"></i>
+        <span>Discover</span>
+      </a>
+
+      <!-- Campaign Details (hidden in nav, accessed via campaign card) -->
+      <a href="/campaigns/featured" class="flex items-center gap-3 px-4 py-3 rounded-lg text-emerald-100 font-medium transition-all duration-200 hover:bg-emerald-700 hover:text-white">
+        <i class="fa-solid fa-heart w-5"></i>
+        <span>Featured</span>
+      </a>
+
+      <!-- Donor Dashboard -->
+      <a href="/donor/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-lg text-emerald-100 font-medium transition-all duration-200 hover:bg-emerald-700 hover:text-white">
+        <i class="fa-solid fa-chart-line w-5"></i>
+        <span>Donor Hub</span>
+      </a>
+
+      <!-- Fundraiser Workspace -->
+      <a href="/fundraiser/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-lg text-emerald-100 font-medium transition-all duration-200 hover:bg-emerald-700 hover:text-white">
+        <i class="fa-solid fa-rocket w-5"></i>
+        <span>Fundraiser</span>
+      </a>
+
+      <!-- Create Campaign -->
+      <a href="/fundraiser/create-campaign" class="flex items-center gap-3 px-4 py-3 rounded-lg text-emerald-100 font-medium transition-all duration-200 hover:bg-emerald-700 hover:text-white">
+        <i class="fa-solid fa-plus-circle w-5"></i>
+        <span>Create Campaign</span>
+      </a>
+
+      <!-- Admin Panel -->
+      <a href="/admin/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-lg text-emerald-100 font-medium transition-all duration-200 hover:bg-emerald-700 hover:text-white">
+        <i class="fa-solid fa-shield w-5"></i>
+        <span>Admin Panel</span>
+      </a>
+
+      <!-- Divider -->
+      <div class="my-4 border-t border-emerald-700"></div>
+
+      <!-- Authentication Links -->
+      <a href="/login" class="flex items-center gap-3 px-4 py-3 rounded-lg text-emerald-100 font-medium transition-all duration-200 hover:bg-emerald-700 hover:text-white">
+        <i class="fa-solid fa-sign-in-alt w-5"></i>
+        <span>Login</span>
+      </a>
+
+      <a href="/register" class="flex items-center gap-3 px-4 py-3 rounded-lg text-emerald-100 font-medium transition-all duration-200 hover:bg-emerald-700 hover:text-white">
+        <i class="fa-solid fa-user-plus w-5"></i>
+        <span>Register</span>
+      </a>
+    </nav>
+
+    <!-- User Profile Section (Bottom) -->
+    <div class="border-t border-emerald-700 p-4">
+      <div class="flex items-center gap-3 p-3 rounded-lg bg-emerald-700 hover:bg-emerald-600 transition-all duration-200 cursor-pointer">
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-300 to-amber-500 flex items-center justify-center font-bold text-emerald-900">
+          JD
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-semibold truncate">John Donor</p>
+          <p class="text-xs text-emerald-200 truncate">john@example.com</p>
+        </div>
+        <button class="p-1 hover:bg-emerald-600 rounded transition-colors">
+          <i class="fa-solid fa-chevron-down text-xs"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT AREA -->
+  <main id="main-content" class="flex-1 ml-64 h-full overflow-y-auto pb-24 scroll-smooth [&::-webkit-scrollbar]:thin [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full" style="scrollbar-width: thin;">
+    
+    <!-- HERO SECTION -->
+    <section id="section-hero" class="relative h-[650px] w-full flex items-center justify-center overflow-hidden">
+      <!-- Background Image with Parallax-like feel -->
+      <div class="absolute inset-0 z-0">
+        <img src="https://images.pexels.com/photos/3656066/pexels-photo-3656066.jpeg?auto=compress&cs=tinysrgb&w=1600" alt="Happy family outdoors" class="w-full h-full object-cover object-center">
+        <!-- Gradient Overlay -->
+        <div class="absolute inset-0 bg-gradient-to-r from-emerald-950/90 via-emerald-900/70 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent"></div>
+      </div>
+
+      <!-- Hero Content -->
+      <div class="relative z-10 max-w-5xl w-full px-8 pt-12">
+        <div class="max-w-2xl space-y-8 animate-fade-in-up">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 backdrop-blur-sm text-emerald-100 text-sm font-medium">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            Over $10M raised this month
+          </div>
+          
+          <h1 class="text-5xl md:text-6xl font-extrabold text-white leading-tight tracking-tight drop-shadow-lg">
+            Empower Dreams,<br>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-teal-200">Fund the Future.</span>
+          </h1>
+          
+          <p class="text-lg text-gray-200 leading-relaxed max-w-xl drop-shadow-md">
+            Join a global community of changemakers. Whether it's medical emergencies, creative projects, or community causes, your contribution sparks real change.
+          </p>
+          
+          <div class="flex flex-wrap items-center gap-4 pt-4">
+            <button class="group relative px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-xl shadow-lg shadow-emerald-900/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-emerald-500/40 overflow-hidden">
+              <span class="relative z-10 flex items-center gap-2">
+                Donate Now
+                <i class="fa-solid fa-heart text-sm group-hover:animate-bounce"></i>
+              </span>
+              <div class="absolute inset-0 bg-gradient-to-r from-emerald-400 to-teal-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            </button>
+            
+            <button class="px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/30 text-white font-bold rounded-xl transition-all duration-300 hover:-translate-y-1">
+              Start Campaign
+            </button>
+          </div>
+
+          <!-- Trust Indicators Mini -->
+          <div class="pt-8 flex items-center gap-6 text-sm text-gray-300 font-medium">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-shield-halved text-emerald-400"></i>
+              Verified Charities
+            </div>
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-lock text-emerald-400"></i>
+              Secure Payments
+            </div>
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-globe text-emerald-400"></i>
+              Global Reach
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATS BAR (Floating overlap) -->
+    <div class="relative z-20 -mt-16 px-6 max-w-7xl mx-auto">
+      <div class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8 grid grid-cols-1 md:grid-cols-4 gap-8 divide-y md:divide-y-0 md:divide-x divide-slate-100">
+        <div class="text-center space-y-1">
+          <p class="text-3xl font-bold text-slate-800">2.5M+</p>
+          <p class="text-sm text-slate-500 font-medium uppercase tracking-wider">Donors</p>
+        </div>
+        <div class="text-center space-y-1 pt-4 md:pt-0">
+          <p class="text-3xl font-bold text-emerald-600">$140M+</p>
+          <p class="text-sm text-slate-500 font-medium uppercase tracking-wider">Funds Raised</p>
+        </div>
+        <div class="text-center space-y-1 pt-4 md:pt-0">
+          <p class="text-3xl font-bold text-slate-800">150k+</p>
+          <p class="text-sm text-slate-500 font-medium uppercase tracking-wider">Campaigns</p>
+        </div>
+        <div class="text-center space-y-1 pt-4 md:pt-0">
+          <p class="text-3xl font-bold text-slate-800">100%</p>
+          <p class="text-sm text-slate-500 font-medium uppercase tracking-wider">Transparency</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CATEGORY SELECTION -->
+    <section id="section-categories" class="py-20 px-8 max-w-7xl mx-auto">
+      <div class="flex items-end justify-between mb-10">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-800">Browse by Category</h2>
+          <p class="text-slate-500 mt-1">Find causes that matter to you</p>
+        </div>
+        <a href="/campaigns" class="text-emerald-600 font-semibold hover:text-emerald-700 flex items-center gap-2 transition-colors">
+          View all <i class="fa-solid fa-arrow-right text-sm"></i>
+        </a>
+      </div>
+
+      <div class="flex gap-6 overflow-x-auto pb-6 [&::-webkit-scrollbar]:hidden" style="scrollbar-width: none; -ms-overflow-style: none;">
+        <!-- Category Card 1 -->
+        <a href="#" class="group flex-shrink-0 w-40 flex flex-col items-center gap-3 p-6 rounded-2xl bg-white border border-slate-100 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-300">
+          <div class="w-14 h-14 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl group-hover:bg-emerald-600 group-hover:text-white transition-colors duration-300">
+            <i class="fa-solid fa-heart-pulse"></i>
+          </div>
+          <span class="font-semibold text-slate-700 group-hover:text-emerald-700">Medical</span>
+        </a>
+
+        <!-- Category Card 2 -->
+        <a href="#" class="group flex-shrink-0 w-40 flex flex-col items-center gap-3 p-6 rounded-2xl bg-white border border-slate-100 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-300">
+          <div class="w-14 h-14 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xl group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
+            <i class="fa-solid fa-graduation-cap"></i>
+          </div>
+          <span class="font-semibold text-slate-700 group-hover:text-blue-700">Education</span>
+        </a>
+
+        <!-- Category Card 3 -->
+        <a href="#" class="group flex-shrink-0 w-40 flex flex-col items-center gap-3 p-6 rounded-2xl bg-white border border-slate-100 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-300">
+          <div class="w-14 h-14 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center text-xl group-hover:bg-amber-600 group-hover:text-white transition-colors duration-300">
+            <i class="fa-solid fa-paw"></i>
+          </div>
+          <span class="font-semibold text-slate-700 group-hover:text-amber-700">Animals</span>
+        </a>
+
+        <!-- Category Card 4 -->
+        <a href="#" class="group flex-shrink-0 w-40 flex flex-col items-center gap-3 p-6 rounded-2xl bg-white border border-slate-100 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-300">
+          <div class="w-14 h-14 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center text-xl group-hover:bg-rose-600 group-hover:text-white transition-colors duration-300">
+            <i class="fa-solid fa-house-chimney-crack"></i>
+          </div>
+          <span class="font-semibold text-slate-700 group-hover:text-rose-700">Disaster</span>
+        </a>
+
+        <!-- Category Card 5 -->
+        <a href="#" class="group flex-shrink-0 w-40 flex flex-col items-center gap-3 p-6 rounded-2xl bg-white border border-slate-100 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-300">
+          <div class="w-14 h-14 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center text-xl group-hover:bg-purple-600 group-hover:text-white transition-colors duration-300">
+            <i class="fa-solid fa-palette"></i>
+          </div>
+          <span class="font-semibold text-slate-700 group-hover:text-purple-700">Creative</span>
+        </a>
+
+        <!-- Category Card 6 -->
+        <a href="#" class="group flex-shrink-0 w-40 flex flex-col items-center gap-3 p-6 rounded-2xl bg-white border border-slate-100 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-300">
+          <div class="w-14 h-14 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center text-xl group-hover:bg-teal-600 group-hover:text-white transition-colors duration-300">
+            <i class="fa-solid fa-leaf"></i>
+          </div>
+          <span class="font-semibold text-slate-700 group-hover:text-teal-700">Environment</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- FEATURED CAMPAIGNS -->
+    <section id="section-featured" class="py-10 px-8 max-w-7xl mx-auto bg-slate-50">
+      <div class="flex items-center justify-between mb-10">
+        <div>
+          <h2 class="text-3xl font-bold text-slate-900">Featured Campaigns</h2>
+          <p class="text-slate-500 mt-2">Urgent causes needing your immediate support</p>
+        </div>
+        <div class="flex gap-2">
+          <button class="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-white hover:shadow-sm transition-all">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <button class="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-white hover:shadow-sm transition-all">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        
+        <!-- Campaign Card 1 -->
+        <article class="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col h-full">
+          <div class="relative h-56 overflow-hidden">
+            <img src="https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Medical surgery" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+            <div class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-emerald-700 shadow-sm">
+              <i class="fa-solid fa-heart-pulse mr-1"></i> Medical
+            </div>
+            <button class="absolute top-4 right-4 w-8 h-8 rounded-full bg-black/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-rose-500 transition-colors">
+              <i class="fa-regular fa-heart"></i>
+            </button>
+          </div>
+          
+          <div class="p-6 flex-1 flex flex-col">
+            <div class="flex items-center gap-3 mb-3">
+              <img src="https://i.pravatar.cc/150?u=12" alt="Sarah M." class="w-8 h-8 rounded-full border-2 border-white shadow-sm">
+              <span class="text-sm text-slate-500">by <span class="text-slate-800 font-medium">Sarah Mitchell</span></span>
+            </div>
+            
+            <h3 class="text-xl font-bold text-slate-800 mb-2 group-hover:text-emerald-700 transition-colors line-clamp-2">
+              Urgent Heart Surgery for Little Leo
+            </h3>
+            <p class="text-slate-500 text-sm mb-6 line-clamp-2">
+              Leo was born with a congenital heart defect. We need your help to fund his life-saving surgery scheduled for next month.
+            </p>
+            
+            <div class="mt-auto space-y-4">
+              <!-- Progress -->
+              <div>
+                <div class="flex justify-between text-sm font-semibold mb-2">
+                  <span class="text-emerald-600">$12,450 raised</span>
+                  <span class="text-slate-400">83%</span>
+                </div>
+                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                  <div class="h-full bg-emerald-500 rounded-full w-[83%] relative overflow-hidden">
+                    <div class="absolute inset-0 bg-white/20 animate-[shimmer_2s_infinite]"></div>
+                  </div>
+                </div>
+                <div class="mt-1 text-xs text-slate-400 text-right">Goal: $15,000</div>
+              </div>
+              
+              <button class="w-full py-3 rounded-xl border-2 border-emerald-100 text-emerald-700 font-bold hover:bg-emerald-50 hover:border-emerald-200 transition-all active:scale-[0.98]">
+                Donate Now
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Campaign Card 2 -->
+        <article class="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col h-full">
+          <div class="relative h-56 overflow-hidden">
+            <img src="https://images.pexels.com/photos/5212345/pexels-photo-5212345.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Students learning" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+            <div class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-blue-700 shadow-sm">
+              <i class="fa-solid fa-book-open mr-1"></i> Education
+            </div>
+            <button class="absolute top-4 right-4 w-8 h-8 rounded-full bg-black/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-rose-500 transition-colors">
+              <i class="fa-regular fa-heart"></i>
+            </button>
+          </div>
+          
+          <div class="p-6 flex-1 flex flex-col">
+            <div class="flex items-center gap-3 mb-3">
+              <img src="https://i.pravatar.cc/150?u=44" alt="David K." class="w-8 h-8 rounded-full border-2 border-white shadow-sm">
+              <span class="text-sm text-slate-500">by <span class="text-slate-800 font-medium">David Kim</span></span>
+            </div>
+            
+            <h3 class="text-xl font-bold text-slate-800 mb-2 group-hover:text-blue-700 transition-colors line-clamp-2">
+              Tech Lab for Rural High School
+            </h3>
+            <p class="text-slate-500 text-sm mb-6 line-clamp-2">
+              Help us provide 50 laptops and coding resources to underprivileged students in rural districts to bridge the digital divide.
+            </p>
+            
+            <div class="mt-auto space-y-4">
+              <!-- Progress -->
+              <div>
+                <div class="flex justify-between text-sm font-semibold mb-2">
+                  <span class="text-emerald-600">$5,200 raised</span>
+                  <span class="text-slate-400">45%</span>
+                </div>
+                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                  <div class="h-full bg-emerald-500 rounded-full w-[45%]"></div>
+                </div>
+                <div class="mt-1 text-xs text-slate-400 text-right">Goal: $11,500</div>
+              </div>
+              
+              <button class="w-full py-3 rounded-xl border-2 border-emerald-100 text-emerald-700 font-bold hover:bg-emerald-50 hover:border-emerald-200 transition-all active:scale-[0.98]">
+                Donate Now
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Campaign Card 3 -->
+        <article class="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col h-full">
+          <div class="relative h-56 overflow-hidden">
+            <img src="https://images.pexels.com/photos/414928/pexels-photo-414928.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Wind turbines" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+            <div class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-teal-700 shadow-sm">
+              <i class="fa-solid fa-leaf mr-1"></i> Environment
+            </div>
+            <button class="absolute top-4 right-4 w-8 h-8 rounded-full bg-black/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-rose-500 transition-colors">
+              <i class="fa-regular fa-heart"></i>
+            </button>
+          </div>
+          
+          <div class="p-6 flex-1 flex flex-col">
+            <div class="flex items-center gap-3 mb-3">
+              <img src="https://i.pravatar.cc/150?u=88" alt="Green Earth" class="w-8 h-8 rounded-full border-2 border-white shadow-sm">
+              <span class="text-sm text-slate-500">by <span class="text-slate-800 font-medium">Green Earth Org</span></span>
+            </div>
+            
+            <h3 class="text-xl font-bold text-slate-800 mb-2 group-hover:text-teal-700 transition-colors line-clamp-2">
+              Community Solar Power Project
+            </h3>
+            <p class="text-slate-500 text-sm mb-6 line-clamp-2">
+              Installing solar panels on the community center roof to reduce carbon footprint and energy costs for local non-profits.
+            </p>
+            
+            <div class="mt-auto space-y-4">
+              <!-- Progress -->
+              <div>
+                <div class="flex justify-between text-sm font-semibold mb-2">
+                  <span class="text-emerald-600">$28,900 raised</span>
+                  <span class="text-slate-400">96%</span>
+                </div>
+                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                  <div class="h-full bg-emerald-500 rounded-full w-[96%]"></div>
+                </div>
+                <div class="mt-1 text-xs text-slate-400 text-right">Goal: $30,000</div>
+              </div>
+              
+              <button class="w-full py-3 rounded-xl border-2 border-emerald-100 text-emerald-700 font-bold hover:bg-emerald-50 hover:border-emerald-200 transition-all active:scale-[0.98]">
+                Donate Now
+              </button>
+            </div>
+          </div>
+        </article>
+
+      </div>
+      
+      <div class="mt-12 text-center">
+        <button class="px-8 py-3 bg-white border border-slate-200 text-slate-600 font-semibold rounded-lg hover:bg-slate-50 hover:text-emerald-600 transition-colors shadow-sm">
+          See All Campaigns
+        </button>
+      </div>
+    </section>
+
+    <!-- TRUST & CTA SECTION -->
+    <section class="bg-emerald-900 text-white py-20 px-8 relative overflow-hidden">
+      <!-- Decorative patterns -->
+      <div class="absolute top-0 right-0 w-96 h-96 bg-emerald-800/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+      <div class="absolute bottom-0 left-0 w-64 h-64 bg-teal-800/30 rounded-full blur-2xl translate-y-1/3 -translate-x-1/4"></div>
+
+      <div class="max-w-7xl mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div class="space-y-8">
+          <h2 class="text-4xl font-bold leading-tight">
+            Trusted by millions.<br>
+            <span class="text-emerald-300">Built for impact.</span>
+          </h2>
+          <p class="text-emerald-100 text-lg leading-relaxed">
+            SafeDonate ensures your generosity reaches those who need it most. With our SafeGive Guarantee, every donation is protected, verified, and transparent.
+          </p>
+          
+          <div class="space-y-4">
+            <div class="flex items-start gap-4">
+              <div class="w-12 h-12 rounded-full bg-emerald-800 flex items-center justify-center flex-shrink-0 text-emerald-300">
+                <i class="fa-solid fa-check text-xl"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-lg">Verified Fundraisers</h4>
+                <p class="text-emerald-200/80 text-sm">Every campaign undergoes a strict 5-step verification process.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4">
+              <div class="w-12 h-12 rounded-full bg-emerald-800 flex items-center justify-center flex-shrink-0 text-emerald-300">
+                <i class="fa-solid fa-bolt text-xl"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-lg">Direct Payouts</h4>
+                <p class="text-emerald-200/80 text-sm">Funds are sent directly to beneficiaries, not intermediaries.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="pt-4">
+            <button class="px-8 py-4 bg-amber-500 hover:bg-amber-400 text-emerald-950 font-bold rounded-xl shadow-lg shadow-amber-900/20 transition-all duration-200 hover:-translate-y-1">
+              Start Your Fundraiser
+            </button>
+          </div>
+        </div>
+
+        <div class="relative">
+          <div class="absolute -inset-4 bg-emerald-500/20 rounded-2xl blur-lg"></div>

@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeDonate - Authentication Suite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        emerald: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            200: '#a7f3d0',
+                            300: '#6ee7b7',
+                            400: '#34d399',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                            950: '#022c22',
+                        },
+                        cream: '#FDFBF7',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out forwards',
+                        'slide-up': 'slideUp 0.6s ease-out forwards',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar Rules */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+        
+        /* Auth Toggle Logic */
+        #tab-register:checked ~ .content-login { display: none; }
+        #tab-register:checked ~ .content-register { display: block; }
+        
+        #tab-login:checked ~ .content-login { display: block; }
+        #tab-login:checked ~ .content-register { display: none; }
+
+        /* Tab Styling */
+        #tab-login:checked ~ .tabs .tab-login-btn {
+            color: #047857;
+            border-bottom-color: #047857;
+        }
+        #tab-register:checked ~ .tabs .tab-register-btn {
+            color: #047857;
+            border-bottom-color: #047857;
+        }
+
+        /* Role Selection Logic */
+        .role-radio:checked + .role-card {
+            border-color: #047857;
+            background-color: #ecfdf5;
+        }
+        .role-radio:checked + .role-card .role-icon {
+            background-color: #047857;
+            color: white;
+        }
+        .role-radio:checked + .role-card .check-icon {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Input Animation */
+        .input-group:focus-within label {
+            transform: translate(0, -12px) scale(0.85);
+            color: #047857;
+        }
+        .input-group input:not(:placeholder-shown) + label {
+            transform: translate(0, -12px) scale(0.85);
+        }
+    </style>
+</head>
+<body class="bg-cream text-slate-800 antialiased overflow-hidden">
+
+    <!-- GLOBAL:SIDEBAR -->
+    <div id="sidebar-main" class="fixed left-0 top-0 h-screen w-64 bg-gradient-to-b from-emerald-900 via-emerald-800 to-emerald-900 text-white shadow-2xl flex flex-col z-50">
+      <!-- Logo Section -->
+      <div class="p-6 border-b border-emerald-700">
+        <div class="flex items-center gap-3">
+          <svg class="w-8 h-8" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2"/>
+            <path d="M16 8v8m-4-4h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M10 24c2-1 4-1.5 6-1.5s4 0.5 6 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <div>
+            <h1 class="text-lg font-bold tracking-tight">SafeDonate</h1>
+            <p class="text-xs text-emerald-300">Crowdfunding</p>
+          </div>
+        </div>
+      </div>
+    
+      <!-- Navigation Items -->
+      <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2 custom-scrollbar">
+        <!-- Landing Page -->
+        <a href="/" class="flex items-center gap-3 px-4 py-3 rounded-lg text-emerald-100 font-medium transition-all duration-200 hover:bg-emerald-700 hover:text-white">
+          <i class="fa-solid fa-home w-5"></i>
+          <span>Home</span>
+        </a>
+    
+        <!-- Campaign Discovery -->
+        <a href="/campaigns" class="flex items-center gap-3 px-4 py-3 rounded-lg text-emerald-100 font-medium transition-all duration-200 hover:bg-emerald-700 hover:text-white">
+          <i class="fa-solid fa-magnifying-glass w-5"></i>
+          <span>Discover</span>
+        </a>
+    
+        <!-- Campaign Details (hidden in nav, accessed via campaign card) -->
+        <a href="/campaigns/featured" class="flex items-center gap-3 px-4 py-3 rounded-lg text-emerald-100 font-medium transition-all duration-200 hover:bg-emerald-700 hover:text-white">
+          <i class="fa-solid fa-heart w-5"></i>
+          <span>Featured</span>
+        </a>
+    
+        <!-- Donor Dashboard -->
+        <a href="/donor/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-lg text-emerald-100 font-medium transition-all duration-200 hover:bg-emerald-700 hover:text-white">
+          <i class="fa-solid fa-chart-line w-5"></i>
+          <span>Donor Hub</span>
+        </a>
+    
+        <!-- Fundraiser Workspace -->
+        <a href="/fundraiser/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-lg text-emerald-100 font-medium transition-all duration-200 hover:bg-emerald-700 hover:text-white">
+          <i class="fa-solid fa-rocket w-5"></i>
+          <span>Fundraiser</span>
+        </a>
+    
+        <!-- Create Campaign -->
+        <a href="/fundraiser/create-campaign" class="flex items-center gap-3 px-4 py-3 rounded-lg text-emerald-100 font-medium transition-all duration-200 hover:bg-emerald-700 hover:text-white">
+          <i class="fa-solid fa-plus-circle w-5"></i>
+          <span>Create Campaign</span>
+        </a>
+    
+        <!-- Admin Panel -->
+        <a href="/admin/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-lg text-emerald-100 font-medium transition-all duration-200 hover:bg-emerald-700 hover:text-white">
+          <i class="fa-solid fa-shield w-5"></i>
+          <span>Admin Panel</span>
+        </a>
+    
+        <!-- Divider -->
+        <div class="my-4 border-t border-emerald-700"></div>
+    
+        <!-- Authentication Links -->
+        <a href="/login" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-emerald-700 text-white font-medium transition-all duration-200 hover:bg-emerald-600 active:scale-95">
+          <i class="fa-solid fa-sign-in-alt w-5"></i>
+          <span>Login</span>
+        </a>
+    
+        <a href="/register" class="flex items-center gap-3 px-4 py-3 rounded-lg text-emerald-100 font-medium transition-all duration-200 hover:bg-emerald-700 hover:text-white">
+          <i class="fa-solid fa-user-plus w-5"></i>
+          <span>Register</span>
+        </a>
+      </nav>
+    
+      <!-- User Profile Section (Bottom) -->
+      <div class="border-t border-emerald-700 p-4">
+        <div class="flex items-center gap-3 p-3 rounded-lg bg-emerald-700 hover:bg-emerald-600 transition-all duration-200 cursor-pointer">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-300 to-amber-500 flex items-center justify-center font-bold text-emerald-900">
+            JD
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold truncate">John Donor</p>
+            <p class="text-xs text-emerald-200 truncate">john@example.com</p>
+          </div>
+          <button class="p-1 hover:bg-emerald-600 rounded transition-colors">
+            <i class="fa-solid fa-chevron-down text-xs"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <div id="main-content" class="ml-64 h-screen flex flex-col relative bg-cream">
+        
+        <!-- Split Screen Layout -->
+        <div class="flex-1 flex overflow-hidden">
+            
+            <!-- LEFT PANEL: Visual/Brand (Hidden on mobile, visible lg) -->
+            <div class="hidden lg:block w-1/2 relative overflow-hidden bg-emerald-900">
+                <!-- Background Image -->
+                <img src="https://images.pexels.com/photos/3184339/pexels-photo-3184339.jpeg?auto=compress&cs=tinysrgb&w=1600" 
+                     alt="Community collaboration" 
+                     class="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay">
+                
+                <!-- Gradient Overlay -->
+                <div class="absolute inset-0 bg-gradient-to-t from-emerald-900 via-emerald-900/40 to-transparent"></div>
+
+                <!-- Content -->
+                <div class="absolute bottom-0 left-0 right-0 p-16 text-white z-10">
+                    <div class="mb-8 animate-slide-up" style="animation-delay: 0.2s;">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-800/50 border border-emerald-600/50 backdrop-blur-sm text-emerald-200 text-sm font-medium mb-6">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            Over $50M Raised This Year
+                        </div>
+                        <h2 class="text-5xl font-serif font-bold leading-tight mb-6">
+                            Empower dreams,<br>
+                            <span class="text-emerald-300 italic">one donation</span> at a time.
+                        </h2>
+                        <p class="text-lg text-emerald-100/90 max-w-md leading-relaxed">
+                            Join a community of 2 million+ changemakers. Whether you're funding a medical emergency or launching the next big idea, SafeDonate is your trusted partner.
+                        </p>
+                    </div>
+
+                    <!-- Testimonial Card -->
+                    <div class="bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-2xl animate-slide-up" style="animation-delay: 0.4s;">
+                        <div class="flex items-start gap-4">
+                            <img src="https://i.pravatar.cc/150?u=44" alt="User" class="w-12 h-12 rounded-full border-2 border-emerald-400">
+                            <div>
+                                <div class="flex text-amber-400 text-xs mb-1">
+                                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                                </div>
+                                <p class="text-sm italic text-white mb-2">"The transparency of this platform gave me the confidence to donate. Seeing the direct impact of my contribution was incredible."</p>
+                                <p class="text-xs font-bold text-emerald-300">Sarah Jenkins, Top Donor</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: Auth Forms -->
+            <div class="w-full lg:w-1/2 flex flex-col relative overflow-y-auto custom-scrollbar bg-cream">
+                
+                <!-- Top Navigation (Mobile/Tablet only) -->
+                <div class="lg:hidden p-6 flex items-center justify-between">
+                    <div class="flex items-center gap-2 text-emerald-800">
+                        <i class="fa-solid fa-circle-nodes text-2xl"></i>
+                        <span class="font-bold text-xl">SafeDonate</span>
+                    </div>
+                </div>
+
+                <!-- Auth Container -->
+                <div class="flex-1 flex flex-col justify-center px-8 sm:px-16 py-12 max-w-2xl mx-auto w-full">
+                    
+                    <!-- State Management (Hidden Radios) -->
+                    <input type="radio" name="auth-view" id="tab-login" class="hidden" checked>
+                    <input type="radio" name="auth-view" id="tab-register" class="hidden">
+
+                    <!-- Header & Tabs -->
+                    <div class="mb-10">
+                        <div class="flex items-center justify-between mb-8">
+                            <h2 class="text-3xl font-serif font-bold text-slate-900 content-login-title">Welcome back</h2>
+                            <h2 class="text-3xl font-serif font-bold text-slate-900 content-register-title hidden">Create account</h2>
+                        </div>
+
+                        <!-- Tab Navigation -->
+                        <div class="tabs flex border-b border-slate-200 relative">
+                            <label for="tab-login" class="tab-login-btn flex-1 pb-4 text-center font-medium text-slate-500 cursor-pointer hover:text-slate-700 border-b-2 border-transparent transition-all duration-300">
+                                Log In
+                            </label>
+                            <label for="tab-register" class="tab-register-btn flex-1 pb-4 text-center font-medium text-slate-500 cursor-pointer hover:text-slate-700 border-b-2 border-transparent transition-all duration-300">
+                                Sign Up
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- LOGIN CONTENT -->
+                    <div class="content-login animate-fade-in">
+                        <form id="form-login" class="space-y-6" onsubmit="event.preventDefault();">
+                            
+                            <!-- Social Auth -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <button class="flex items-center justify-center gap-3 px-4 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 group">
+                                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google">
+                                    <span class="text-sm font-medium text-slate-600 group-hover:text-slate-800">Google</span>
+                                </button>
+                                <button class="flex items-center justify-center gap-3 px-4 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 group">
+                                    <i class="fa-brands fa-apple text-xl text-slate-800"></i>
+                                    <span class="text-sm font-medium text-slate-600 group-hover:text-slate-800">Apple</span>
+                                </button>
+                            </div>
+
+                            <div class="relative flex items-center py-2">
+                                <div class="flex-grow border-t border-slate-200"></div>
+                                <span class="flex-shrink-0 mx-4 text-xs font-medium text-slate-400 uppercase tracking-wider">Or continue with email</span>
+                                <div class="flex-grow border-t border-slate-200"></div>
+                            </div>
+
+                            <!-- Email Input -->
+                            <div class="input-group relative">
+                                <input type="email" id="login-email" class="peer w-full px-4 py-3.5 rounded-xl border border-slate-200 text-slate-900 placeholder-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all bg-white" placeholder="Email address">
+                                <label for="login-email" class="absolute left-4 top-3.5 text-slate-400 text-sm transition-all pointer-events-none">Email address</label>
+                                <i class="fa-regular fa-envelope absolute right-4 top-4 text-slate-400"></i>
+                            </div>
+
+                            <!-- Password Input -->
+                            <div class="space-y-2">
+                                <div class="input-group relative">
+                                    <input type="password" id="login-password" class="peer w-full px-4 py-3.5 rounded-xl border border-slate-200 text-slate-900 placeholder-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all bg-white" placeholder="Password">
+                                    <label for="login-password" class="absolute left-4 top-3.5 text-slate-400 text-sm transition-all pointer-events-none">Password</label>
+                                    <button type="button" class="absolute right-4 top-4 text-slate-400 hover:text-slate-600 focus:outline-none">
+                                        <i class="fa-regular fa-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="flex justify-end">
+                                    <a href="#" class="text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline">Forgot password?</a>
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button class="w-full py-4 px-6 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-semibold shadow-lg shadow-emerald-700/20 transform transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2">
+                                <span>Sign In</span>
+                                <i class="fa-solid fa-arrow-right text-sm"></i>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- REGISTER CONTENT -->
+                    <div class="content-register animate-fade-in hidden">
+                        <form id="form-register" class="space-y-6" onsubmit="event.preventDefault();">
+                            
+                            <!-- Role Selection -->
+                            <div class="space-y-3">
+                                <label class="text-sm font-semibold text-slate-700 uppercase tracking-wider">I want to...</label>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <!-- Donor Option -->
+                                    <label class="cursor-pointer group">
+                                        <input type="radio" name="role" class="role-radio hidden" checked>
+                                        <div class="role-card h-full p-4 rounded-xl border-2 border-slate-200 bg-white hover:border-emerald-200 transition-all duration-200 relative overflow-hidden">
+                                            <div class="flex flex-col items-center text-center gap-3">
+                                                <div class="role-icon w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center transition-colors duration-200">
+                                                    <i class="fa-solid fa-heart"></i>
+                                                </div>
+                                                <div>
+                                                    <span class="block font-bold text-slate-800">Donate</span>
+                                                    <span class="text-xs text-slate-500">Support causes</span>
+                                                </div>
+                                            </div>
+                                            <div class="check-icon absolute top-2 right-2 text-emerald-600 opacity-0 transform scale-50 transition-all duration-200">
+                                                <i class="fa-solid fa-circle-check"></i>
+                                            </div>
+                                        </div>
+                                    </label>
+
+                                    <!-- Fundraiser Option -->
+                                    <label class="cursor-pointer group">
+                                        <input type="radio" name="role" class="role-radio hidden">
+                                        <div class="role-card h-full p-4 rounded-xl border-2 border-slate-200 bg-white hover:border-emerald-200 transition-all duration-200 relative overflow-hidden">
+                                            <div class="flex flex-col items-center text-center gap-3">
+                                                <div class="role-icon w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center transition-colors duration-200">
+                                                    <i class="fa-solid fa-rocket"></i>
+                                                </div>
+                                                <div>
+                                                    <span class="block font-bold text-slate-800">Fundraise</span>
+                                                    <span class="text-xs text-slate-500">Start a campaign</span>
+                                                </div>
+                                            </div>
+                                            <div class="check-icon absolute top-2 right-2 text-emerald-600 opacity-0 transform scale-50 transition-all duration-200">
+                                                <i class="fa-solid fa-circle-check"></i>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Name Input -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="input-group relative">
+                                    <input type="text" id="reg-fname" class="peer w-full px-4 py-3.5 rounded-xl border border-slate-200 text-slate-900 placeholder-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all bg-white" placeholder="First Name">
+                                    <label for="reg-fname" class="absolute left-4 top-3.5 text-slate-400 text-sm transition-all pointer-events-none">First Name</label>
+                                </div>
+                                <div class="input-group relative">
+                                    <input type="text" id="reg-lname" class="peer w-full px-4 py-3.5 rounded-xl border border-slate-200 text-slate-900 placeholder-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all bg-white" placeholder="Last Name">
+                                    <label for="reg-lname" class="absolute left-4 top-3.5 text-slate-400 text-sm transition-all pointer-events-none">Last Name</label>
+                                </div>
+                            </div>
+
+                            <!-- Email Input (Error State Demo) -->
+                            <div class="input-group relative">
+                                <input type="email" id="reg-email" class="peer w-full px-4 py-3.5 rounded-xl border border-red-300 text-slate-900 placeholder-transparent focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all bg-white" placeholder="Email address" value="invalid-email">
+                                <label for="reg-email" class="absolute left-4 top-3.5 text-red-400 text-sm transition-all pointer-events-none">Email address</label>
+                                <i class="fa-solid fa-circle-exclamation absolute right-4 top-4 text-red-500"></i>
+                                <p class="text-xs text-red-500 mt-1 ml-1">Please enter a valid email address.</p>
+                            </div>
+
+                            <!-- Password Input with Strength -->
+                            <div class="space-y-2">
+                                <div class="input-group relative">
+                                    <input type="password" id="reg-password" class="peer w-full px-4 py-3.5 rounded-xl border border-slate-200 text-slate-900 placeholder-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all bg-white" placeholder="Create Password">
+                                    <label for="reg-password" class="absolute left-4 top-3.5 text-slate-400 text-sm transition-all pointer-events-none">Create Password</label>
+                                </div>
+                                <!-- Strength Meter -->
+                                <div class="flex gap-1 h-1 mt-2">
+                                    <div class="flex-1 bg-emerald-500 rounded-full"></div>
+                                    <div class="flex-1 bg-emerald-500 rounded-full"></div>
+                                    <div class="flex-1 bg-slate-200 rounded-full"></div>
+                                    <div class="flex-1 bg-slate-200 rounded-full"></div>
+                                </div>
+                                <p class="text-xs text-emerald-600 font-medium">Strength: Medium</p>
+                            </div>
+
+                            <!-- Terms Checkbox -->
+                            <div class="flex items-start gap-3">
+                                <div class="flex items-center h-5">
+                                    <input id="terms" type="checkbox" class="w-4 h-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
+                                </div>
+                                <label for="terms" class="text-sm text-slate-500">
+                                    I agree to the <a href="#" class="text-emerald-600 hover:underline">Terms of Service</a> and <a href="#" class="text-emerald-600 hover:underline">Privacy Policy</a>.
+                                </label>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button class="w-full py-4 px-6 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-semibold shadow-lg shadow-emerald-700/20 transform transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2">
+                                <span>Create Account</span>
+                                <i class="fa-solid fa-user-plus text-sm"></i>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Footer Links -->
+                    <div class="mt-10 text-center">
+                        <p class="text-sm text-slate-400">
+                            Protected by reCAPTCHA and subject to the Google 
+                            <a href="#" class="underline hover:text-slate-600">Privacy Policy</a> and 
+                            <a href="#" class="underline hover:text-slate-600">Terms of Service</a>.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- GLOBAL:FOOTER -->
+        <footer class="bg-white border-t border-gray-200 shadow-lg z-20 relative">
+          <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="text-sm text-gray-600">
+              <p>© 2024 SafeDonate. All rights reserved.</p>
+            </div>
+            <div class="flex items-center gap-6">
+              <a href="#" class="text-sm text-gray-600 hover:text-emerald-600 transition-colors">Privacy Policy</a>
+              <a href="#" class="text-sm text-gray-600 hover:text-emerald-600 transition-colors">Terms of Service</a>
+              <a href="#" class="text-sm text-gray-600 hover:text-emerald-600 transition-colors">Contact</a>

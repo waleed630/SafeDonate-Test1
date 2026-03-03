@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+* {
+  color-scheme: light;
+}
+
+/* Prevent horizontal overflow on mobile */
+html, body {
+  overflow-x: hidden;
+}
+
+/* Auth page: floating label on focus/has value */
+.input-group:focus-within label {
+  transform: translate(0, -12px) scale(0.85);
+  color: #047857;
+}
+.input-group input:not(:placeholder-shown) ~ label {
+  transform: translate(0, -12px) scale(0.85);
+}
+
+/* Custom scrollbar for auth */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 20px;
+}
+
+/* Register page scrollbar */
+.register-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.register-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.register-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #e5e7eb;
+  border-radius: 20px;
+}
+.register-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: #d1d5db;
+}
+
+/* Discover page */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.discover-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.discover-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.discover-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 20px;
+}
+.discover-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: #94a3b8;
+}
