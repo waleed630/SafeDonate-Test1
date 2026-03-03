@@ -1,13 +1,10 @@
 import { Link } from 'react-router-dom';
 import { campaigns } from '../data/campaigns';
+import { mockDonations, formatTimestamp } from '../data/mockData';
 
 export function AdminDashboardPage() {
   const pendingCampaigns = campaigns.slice(0, 3);
-  const recentDonations = [
-    { id: 1, donor: 'Alex M.', campaign: 'Urgent Heart Surgery', amount: 50, date: '2 hours ago' },
-    { id: 2, donor: 'Jordan K.', campaign: 'Tech Lab for Rural School', amount: 100, date: '5 hours ago' },
-    { id: 3, donor: 'Sam P.', campaign: 'Community Solar Project', amount: 25, date: '1 day ago' },
-  ];
+  const recentDonations = mockDonations.slice(0, 5).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
   return (
     <div className="py-6 sm:py-10 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto">
@@ -107,10 +104,14 @@ export function AdminDashboardPage() {
             {recentDonations.map((d) => (
               <div key={d.id} className="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-50/50 transition-colors">
                 <div className="min-w-0">
-                  <p className="font-semibold text-slate-800">{d.donor} donated ${d.amount}</p>
+                  <p className="font-semibold text-slate-800">{d.donorName} donated ${d.amount}</p>
                   <p className="text-sm text-slate-500 truncate">to {d.campaign}</p>
+                  <p className="text-xs text-slate-400 mt-0.5">{formatTimestamp(d.timestamp)}</p>
                 </div>
-                <span className="text-xs text-slate-400 flex-shrink-0">{d.date}</span>
+                <span className="flex items-center gap-1 flex-shrink-0">
+                  {d.verified && <span className="text-emerald-500" title="Verified"><i className="fa-solid fa-shield-check text-xs" /></span>}
+                  <span className="text-xs text-slate-400">{d.transactionId}</span>
+                </span>
               </div>
             ))}
           </div>
