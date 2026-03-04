@@ -3,9 +3,18 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { ChartCard } from '../../components/ui/ChartCard';
 import { DashboardCard } from '../../components/ui/DashboardCard';
 import { mockChartData } from '../../data/mockData';
+import { useRealtime } from '../../contexts/RealtimeContext';
+
+const mockEngagement = {
+  linkClicks: 1240,
+  pageViews: 5820,
+  conversionRate: 4.0,
+  shares: 89,
+};
 
 export function CampaignAnalyticsPage() {
   const { id } = useParams();
+  const { connected } = useRealtime();
 
   return (
     <div className="py-6 sm:py-10 px-4 sm:px-6 md:px-8 max-w-6xl mx-auto">
@@ -48,6 +57,35 @@ export function CampaignAnalyticsPage() {
             </LineChart>
           </ResponsiveContainer>
         </ChartCard>
+      </div>
+
+      <div className="mb-8">
+        <div className="flex items-center gap-2 mb-4">
+          <h2 className="text-lg font-bold text-slate-900">Engagement &amp; performance</h2>
+          {connected && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live
+            </span>
+          )}
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
+            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Link clicks</p>
+            <p className="text-2xl font-bold text-slate-800">{mockEngagement.linkClicks.toLocaleString()}</p>
+          </div>
+          <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
+            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Page views</p>
+            <p className="text-2xl font-bold text-slate-800">{mockEngagement.pageViews.toLocaleString()}</p>
+          </div>
+          <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
+            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Conversion rate</p>
+            <p className="text-2xl font-bold text-slate-800">{mockEngagement.conversionRate}%</p>
+          </div>
+          <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
+            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Shares</p>
+            <p className="text-2xl font-bold text-slate-800">{mockEngagement.shares}</p>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { campaigns } from '../data/campaigns';
 import { CampaignCard } from '../components/CampaignCard';
+import { RecommendedCampaigns } from '../components/campaign/RecommendedCampaigns';
 
 const myDonations = campaigns.slice(0, 2);
 
@@ -75,6 +76,8 @@ export function DonorDashboardPage() {
           ))}
         </div>
       </div>
+
+      <RecommendedCampaigns title="Suggested campaigns" maxItems={4} className="mt-10" />
     </div>
   );
 }

@@ -31,6 +31,9 @@ import { ManageCampaignsPage } from './pages/admin/ManageCampaignsPage';
 import { CampaignVerificationPage } from './pages/admin/CampaignVerificationPage';
 import { FraudMonitoringPage } from './pages/admin/FraudMonitoringPage';
 import { PlatformAnalyticsPage } from './pages/admin/PlatformAnalyticsPage';
+import { ManagePaymentsPage } from './pages/admin/ManagePaymentsPage';
+import { ManageCategoriesPage } from './pages/admin/ManageCategoriesPage';
+import { ManageTagsPage } from './pages/admin/ManageTagsPage';
 
 function App() {
   return (
@@ -68,6 +71,9 @@ function App() {
             <Route path="verification" element={<CampaignVerificationPage />} />
             <Route path="fraud" element={<FraudMonitoringPage />} />
             <Route path="analytics" element={<PlatformAnalyticsPage />} />
+            <Route path="payments" element={<ManagePaymentsPage />} />
+            <Route path="categories" element={<ManageCategoriesPage />} />
+            <Route path="tags" element={<ManageTagsPage />} />
           </Route>
         </Route>
 

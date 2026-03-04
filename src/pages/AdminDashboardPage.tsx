@@ -16,11 +16,17 @@ export function AdminDashboardPage() {
           <span className="text-slate-300">•</span>
           <Link to="/admin/campaigns" className="text-sm text-emerald-600 hover:text-emerald-700 font-medium">Manage Campaigns</Link>
           <span className="text-slate-300">•</span>
+          <Link to="/admin/payments" className="text-sm text-emerald-600 hover:text-emerald-700 font-medium">Manage Payments</Link>
+          <span className="text-slate-300">•</span>
           <Link to="/admin/verification" className="text-sm text-emerald-600 hover:text-emerald-700 font-medium">Verification</Link>
           <span className="text-slate-300">•</span>
           <Link to="/admin/fraud" className="text-sm text-emerald-600 hover:text-emerald-700 font-medium">Fraud Monitoring</Link>
           <span className="text-slate-300">•</span>
           <Link to="/admin/analytics" className="text-sm text-emerald-600 hover:text-emerald-700 font-medium">Analytics</Link>
+          <span className="text-slate-300">•</span>
+          <Link to="/admin/categories" className="text-sm text-emerald-600 hover:text-emerald-700 font-medium">Categories</Link>
+          <span className="text-slate-300">•</span>
+          <Link to="/admin/tags" className="text-sm text-emerald-600 hover:text-emerald-700 font-medium">Tags</Link>
         </div>
       </div>
 

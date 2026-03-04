@@ -1,4 +1,5 @@
 import { mockLiveDonations, type LiveDonation } from '../../data/mockData';
+import { useRealtime } from '../../contexts/RealtimeContext';
 
 interface LiveDonationTickerProps {
   variant?: 'campaign' | 'discover';
@@ -8,12 +9,15 @@ interface LiveDonationTickerProps {
 }
 
 export function LiveDonationTicker({ variant = 'discover', campaignId, maxItems = 6, className = '' }: LiveDonationTickerProps) {
-  let items: LiveDonation[] = mockLiveDonations;
+  const { connected, liveDonations: realtimeDonations } = useRealtime();
+  const source = connected ? realtimeDonations : mockLiveDonations;
+
+  let items: LiveDonation[] = source;
   if (variant === 'campaign' && campaignId) {
-    items = mockLiveDonations.filter((d) => d.campaignId === campaignId);
+    items = source.filter((d) => d.campaignId === campaignId);
   }
   if (items.length === 0 && variant === 'campaign') {
-    items = mockLiveDonations.slice(0, 3).map((d) => ({ ...d, campaignId }));
+    items = (connected ? source : mockLiveDonations).slice(0, 3).map((d) => ({ ...d, campaignId }));
   }
   items = items.slice(0, maxItems);
 

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useRealtime } from '../contexts/RealtimeContext';
 
 interface Notification {
   id: string;
@@ -34,6 +35,7 @@ export function NotificationDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const [notifications] = useState<Notification[]>(MOCK_NOTIFICATIONS);
   const ref = useRef<HTMLDivElement>(null);
+  const { hasNewNotification, setHasNewNotification } = useRealtime();
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -43,7 +45,12 @@ export function NotificationDropdown() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    if (isOpen) setHasNewNotification(false);
+  }, [isOpen, setHasNewNotification]);
+
   const unreadCount = notifications.filter((n) => !n.read).length;
+  const showBadge = unreadCount > 0 || hasNewNotification;
 
   return (
     <div className="relative" ref={ref}>
@@ -53,7 +60,7 @@ export function NotificationDropdown() {
         className="relative p-2.5 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-full transition-colors"
       >
         <i className="fa-regular fa-bell text-xl" />
-        {unreadCount > 0 && (
+        {showBadge && (
           <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
         )}
       </button>

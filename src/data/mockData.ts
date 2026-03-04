@@ -43,6 +43,23 @@ export const mockCampaignUpdates = [
   { id: '2', text: 'We reached 80% of our goal. Amazing support!', date: '2024-02-14' },
 ];
 
+export interface CampaignComment {
+  id: string;
+  campaignId: number;
+  userId: string;
+  userName: string;
+  userAvatar?: string;
+  text: string;
+  date: string;
+  isOwner?: boolean;
+}
+
+export const mockCampaignComments: CampaignComment[] = [
+  { id: 'c1', campaignId: 1, userId: '1', userName: 'John D.', userAvatar: 'https://i.pravatar.cc/150?u=donor', text: 'Happy to support this cause. Wishing a speedy recovery!', date: '2024-02-16T10:00:00Z', isOwner: false },
+  { id: 'c2', campaignId: 1, userId: '2', userName: 'Sarah M.', userAvatar: 'https://i.pravatar.cc/150?u=44', text: 'Such an important campaign. Donated and shared.', date: '2024-02-15T14:30:00Z', isOwner: false },
+  { id: 'c3', campaignId: 2, userId: '1', userName: 'John D.', text: 'Great initiative for education.', date: '2024-02-14T09:00:00Z', isOwner: false },
+];
+
 export function getDonationsByCampaign(campaignId: number): Donation[] {
   return mockDonations.filter((d) => d.campaignId === campaignId).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 }

@@ -1,7 +1,12 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { categories } from '../data/campaigns';
+import { useCategories } from '../contexts/CategoriesContext';
+import { useTags } from '../contexts/TagsContext';
 
 export function CreateCampaignPage() {
+  const { activeCategories } = useCategories();
+  const { tags } = useTags();
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   return (
     <div className="py-6 sm:py-10 px-4 sm:px-6 md:px-8 max-w-3xl mx-auto">
       <div className="mb-10">
@@ -31,10 +36,30 @@ export function CreateCampaignPage() {
                 id="category"
                 className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none transition-all"
               >
-                {categories.map((cat) => (
+                {activeCategories.map((cat) => (
                   <option key={cat.id} value={cat.id}>{cat.label}</option>
                 ))}
               </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Tags</label>
+              <div className="flex flex-wrap gap-2">
+                {tags.map((tag) => (
+                  <label key={tag.id} className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 hover:border-emerald-500 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={selectedTagIds.includes(tag.id)}
+                      onChange={(e) =>
+                        setSelectedTagIds((prev) =>
+                          e.target.checked ? [...prev, tag.id] : prev.filter((id) => id !== tag.id)
+                        )
+                      }
+                      className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                    />
+                    <span className="text-sm text-slate-700">{tag.label}</span>
+                  </label>
+                ))}
+              </div>
             </div>
             <div>
               <label htmlFor="description" className="block text-sm font-medium text-slate-700 mb-2">Story</label>

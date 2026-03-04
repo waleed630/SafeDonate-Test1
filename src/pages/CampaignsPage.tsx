@@ -9,13 +9,16 @@ import {
   type SortOption,
 } from '../data/discoverCampaigns';
 import { LiveDonationMarquee } from '../components/live/LiveDonationMarquee';
+import { useTagsOptional } from '../contexts/TagsContext';
 
 export function CampaignsPage() {
+  const tagsContext = useTagsOptional();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [search, setSearch] = useState('');
   const [locationFilter, setLocationFilter] = useState<string>('all');
   const [targetFilter, setTargetFilter] = useState<string>('all');
   const [progressFilter, setProgressFilter] = useState<string>('all');
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [showFilters, setShowFilters] = useState(false);
   const filtersRef = useRef<HTMLDivElement>(null);
@@ -40,7 +43,10 @@ export function CampaignsPage() {
     const matchTarget = c.goal >= targetRange.min && c.goal <= targetRange.max;
     const progressRange = progressRanges.find((r) => r.id === progressFilter) || progressRanges[0];
     const matchProgress = c.percent >= progressRange.min && c.percent < progressRange.max;
-    return matchCategory && matchSearch && matchLocation && matchTarget && matchProgress;
+    const matchTag =
+      selectedTagIds.length === 0 ||
+      (c.tagIds && selectedTagIds.some((tid) => c.tagIds!.includes(tid)));
+    return matchCategory && matchSearch && matchLocation && matchTarget && matchProgress && matchTag;
   });
 
   const sorted = [...filtered].sort((a, b) => {
@@ -59,7 +65,10 @@ export function CampaignsPage() {
   });
 
   const activeFiltersCount =
-    (locationFilter !== 'all' ? 1 : 0) + (targetFilter !== 'all' ? 1 : 0) + (progressFilter !== 'all' ? 1 : 0);
+    (locationFilter !== 'all' ? 1 : 0) +
+    (targetFilter !== 'all' ? 1 : 0) +
+    (progressFilter !== 'all' ? 1 : 0) +
+    selectedTagIds.length;
 
   return (
     <>
@@ -149,11 +158,37 @@ export function CampaignsPage() {
                       ))}
                     </select>
                   </div>
+                  {tagsContext && tagsContext.tags.length > 0 && (
+                    <div>
+                      <label className="block text-xs font-medium text-slate-500 mb-1.5">Tags</label>
+                      <div className="flex flex-wrap gap-2">
+                        {tagsContext.tags.map((tag) => (
+                          <label
+                            key={tag.id}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 text-sm cursor-pointer hover:border-emerald-500"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedTagIds.includes(tag.id)}
+                              onChange={(e) =>
+                                setSelectedTagIds((prev) =>
+                                  e.target.checked ? [...prev, tag.id] : prev.filter((id) => id !== tag.id)
+                                )
+                              }
+                              className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                            />
+                            <span>{tag.label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   <button
                     onClick={() => {
                       setLocationFilter('all');
                       setTargetFilter('all');
                       setProgressFilter('all');
+                      setSelectedTagIds([]);
                     }}
                     className="text-sm text-slate-500 hover:text-emerald-600 font-medium"
                   >

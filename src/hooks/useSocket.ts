@@ -9,7 +9,12 @@ export function useSocket() {
 
   useEffect(() => {
     try {
-      const s = io(SOCKET_URL, { autoConnect: true, reconnection: false });
+      const s = io(SOCKET_URL, {
+        autoConnect: true,
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+      });
       s.on('connect', () => setConnected(true));
       s.on('connect_error', () => setConnected(false));
       s.on('disconnect', () => setConnected(false));

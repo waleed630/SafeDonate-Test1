@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { campaigns } from '../data/campaigns';
 import { ProgressBar } from '../components/ui/ProgressBar';
@@ -7,10 +7,19 @@ import { LiveBadge } from '../components/live/LiveBadge';
 import { OnlineViewers } from '../components/live/OnlineViewers';
 import { LiveDonationTicker } from '../components/live/LiveDonationTicker';
 import { mockCampaignUpdates, getDonationsByCampaign, formatTimestamp } from '../data/mockData';
+import { useRealtime } from '../contexts/RealtimeContext';
+import { CampaignComments } from '../components/campaign/CampaignComments';
 
 export function CampaignDetailsPage() {
   const { id } = useParams();
-  const campaign = campaigns.find((c) => c.id === Number(id)) || campaigns[0];
+  const realtime = useRealtime();
+  const campaignFromData = campaigns.find((c) => c.id === Number(id)) || campaigns[0];
+  const progressOverride = realtime.getProgressOverride(campaignFromData.id);
+  const campaign = useMemo(() => {
+    if (!progressOverride) return campaignFromData;
+    return { ...campaignFromData, raised: progressOverride.raised, goal: progressOverride.goal, percent: progressOverride.percent };
+  }, [campaignFromData, progressOverride]);
+  const viewerCount = realtime.connected ? realtime.getViewerCount(campaign.id) : 12;
   const [showDonateModal, setShowDonateModal] = useState(false);
   const [donationAmount, setDonationAmount] = useState(25);
   const [donationSuccess, setDonationSuccess] = useState(false);
@@ -80,6 +89,8 @@ export function CampaignDetailsPage() {
                 ))}
               </div>
             </div>
+
+            <CampaignComments campaignId={campaign.id} organizerName={campaign.author} />
           </div>
         </div>
 
@@ -93,7 +104,7 @@ export function CampaignDetailsPage() {
                 </div>
                 <ProgressBar value={campaign.percent} showLabel size="md" />
               </div>
-              <OnlineViewers count={12} className="mb-6" />
+              <OnlineViewers count={viewerCount > 0 ? viewerCount : 12} className="mb-6" />
               <p className="text-slate-500 text-sm mb-6">{getDonationsByCampaign(campaign.id).length} donors</p>
             <button
               onClick={() => setShowDonateModal(true)}
