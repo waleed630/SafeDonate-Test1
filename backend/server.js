@@ -8,6 +8,7 @@ import passport from "passport";
 import cookieParser from "cookie-parser";
 
 import authRoutes from "./routes/authRoutes.js";
+import campaignRoutes from './routes/campaignRoutes.js';
 
 import logger from "./config/logger.js";
 import { morganMiddleware } from "./config/logger.js";
@@ -67,6 +68,7 @@ app.use(passport.initialize());
 
 // ====================== ROUTES (Phase 1 - Only Auth) ======================
 app.use("/api/auth", authRoutes);
+app.use('/api/campaigns', campaignRoutes);
 
 // ====================== HEALTH CHECK ======================
 app.get("/", (req, res) => {
