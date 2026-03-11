@@ -70,6 +70,11 @@ campaignSchema.virtual('progress').get(function () {
     if (this.goalAmount <= 0) return 0;
     return Math.min(100, Math.round((this.raisedAmount / this.goalAmount) * 100));
 });
+campaignSchema.methods.addDonation = async function (amount) {
+    this.raisedAmount += amount;
+    this.donorCount += 1;
+    await this.save();
+};
 
 campaignSchema.virtual('daysLeft').get(function () {
     const now = new Date();

@@ -15,6 +15,7 @@ import { morganMiddleware } from "./config/logger.js";
 import errorHandler from "./middleware/errorHandler.js";
 //import errorHander from "./middlewares/errorHandler.js"; 
 import User from "./models/User.js";                    // ← For admin seeding
+import donationRoutes from './routes/donationRoutes.js';
 
 import path from "path";
 import { fileURLToPath } from "url";
@@ -69,6 +70,8 @@ app.use(passport.initialize());
 // ====================== ROUTES (Phase 1 - Only Auth) ======================
 app.use("/api/auth", authRoutes);
 app.use('/api/campaigns', campaignRoutes);
+app.use('/api/donations', donationRoutes);
+
 
 // ====================== HEALTH CHECK ======================
 app.get("/", (req, res) => {
@@ -78,6 +81,27 @@ app.get("/", (req, res) => {
         timestamp: new Date().toISOString(),
         env: process.env.NODE_ENV || "development",
     });
+});
+
+// ====================== STRIPE CHECKOUT SUCCESS ROUTE ======================
+// Stripe will redirect here after a successful checkout if your `success_url` points to this path.
+app.get("/donation/success", async (req, res) => {
+    const sessionId = req.query.session_id;
+
+    res.send(`
+        <html>
+          <head>
+            <meta charset="utf-8" />
+            <title>Donation Success</title>
+          </head>
+          <body style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 2rem;">
+            <h1>Donation Successful 🎉</h1>
+            <p>Your payment was successful. You can safely close this window or return to the app.</p>
+            <p><strong>Checkout Session:</strong> ${sessionId || "(missing session_id)"}</p>
+            <p><a href="/">Back to API root</a></p>
+          </body>
+        </html>
+    `);
 });
 
 // ====================== ERROR HANDLING ======================
