@@ -2,20 +2,22 @@
 import Message from '../models/Message.js';
 import Notification from '../models/Notification.js';
 import Campaign from '../models/Campaign.js';
+import Donation from '../models/Donation.js';
+import { sendEmailNotification } from '../services/notificationService.js';   // We'll create this
 
 const initializeSocket = (io) => {
-  const onlineUsers = new Map(); // userId → socketId
+  const onlineUsers = new Map(); // userId → socket.id
 
   io.on("connection", (socket) => {
     console.log(`🔌 User connected: ${socket.id}`);
 
-    // ==================== ONLINE USERS ====================
+    // ==================== ONLINE USERS TRACKING ====================
     socket.on("registerOnline", ({ userId }) => {
-      onlineUsers.set(userId, socket.id);
+      onlineUsers.set(userId.toString(), socket.id);
       io.emit("onlineUsersUpdate", Array.from(onlineUsers.keys()));
     });
 
-    // ==================== CHAT (Existing) ====================
+    // ==================== CHAT SYSTEM (Existing - Kept 100%) ====================
     socket.on("joinChat", ({ userId, otherUserId }) => {
       const room = [userId, otherUserId].sort().join("-");
       socket.join(room);
@@ -37,7 +39,7 @@ const initializeSocket = (io) => {
       socket.to(room).emit("userTyping", { from });
     });
 
-    // ==================== REAL-TIME DONATION UPDATES ====================
+    // ==================== REAL-TIME DONATION UPDATES (Existing - Kept) ====================
     socket.on("newDonation", async (data) => {
       const { campaignId, amount, donorId } = data;
 
@@ -47,7 +49,7 @@ const initializeSocket = (io) => {
         campaign.donorCount += 1;
         await campaign.save();
 
-        // Broadcast instant progress update to everyone
+        // Broadcast instant progress bar update to everyone
         io.emit("progressUpdate", {
           campaignId,
           raisedAmount: campaign.raisedAmount,
@@ -55,21 +57,41 @@ const initializeSocket = (io) => {
           donorCount: campaign.donorCount
         });
 
-        // Send live notification to fundraiser
+        // Send notification to fundraiser
         const notification = new Notification({
           user: campaign.fundraiser,
           type: 'donation',
           title: 'New Donation Received!',
-          message: `Someone donated $${amount}`,
+          message: `Someone just donated $${amount}`,
           campaign: campaignId,
         });
         await notification.save();
 
-        io.to(onlineUsers.get(campaign.fundraiser.toString())).emit("newNotification", notification);
+        const socketId = onlineUsers.get(campaign.fundraiser.toString());
+        if (socketId) io.to(socketId).emit("newNotification", notification);
       }
     });
 
-    // ==================== DISCONNECT ====================
+    // ==================== NEW: FEATURE 9 - ENGAGEMENT & COMMUNICATION ====================
+    socket.on("sendNotification", async (data) => {
+      const { userId, title, message, type, campaignId } = data;
+
+      const notification = new Notification({
+        user: userId,
+        type,
+        title,
+        message,
+        campaign: campaignId,
+      });
+      await notification.save();
+
+      // Real-time push to online user
+      const socketId = onlineUsers.get(userId.toString());
+      if (socketId) {
+        io.to(socketId).emit("newNotification", notification);
+      }
+    });
+
     socket.on("disconnect", () => {
       for (let [userId, socketId] of onlineUsers.entries()) {
         if (socketId === socket.id) {

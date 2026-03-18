@@ -20,6 +20,7 @@ import donationTrackingRoutes from './routes/donationTrackingRoutes.js';
 import initializeSocket from "./socket/socketHandler.js";
 import notificationRoutes from './routes/notificationRoutes.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
+import testRoutes from './routes/testRoutes.js';
 
 import path from "path";
 import { fileURLToPath } from "url";
@@ -91,7 +92,7 @@ app.use("/api/donations/tracking", donationTrackingRoutes);
 app.use("/api/notifications", notificationRoutes);
 // analytics
 app.use('/api/analytics', analyticsRoutes);
-
+app.use('/api/test', testRoutes);
 // ====================== HEALTH CHECK ======================
 app.get("/", (req, res) => {
     res.json({

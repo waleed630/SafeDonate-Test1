@@ -9,11 +9,11 @@ const notificationSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['donation', 'campaign_update', 'system'],
+    enum: ['donation', 'campaign_update', 'system', 'chat'],
     required: true,
   },
-  title: String,
-  message: String,
+  title: { type: String, required: true },
+  message: { type: String, required: true },
   campaign: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Campaign',
