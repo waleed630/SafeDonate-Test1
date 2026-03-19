@@ -21,6 +21,7 @@ import initializeSocket from "./socket/socketHandler.js";
 import notificationRoutes from './routes/notificationRoutes.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
 import testRoutes from './routes/testRoutes.js';
+import verificationRoutes from './routes/verificationRoutes.js';
 
 import path from "path";
 import { fileURLToPath } from "url";
@@ -93,6 +94,8 @@ app.use("/api/notifications", notificationRoutes);
 // analytics
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/test', testRoutes);
+// Verification Module
+app.use('/api/verification', verificationRoutes);
 // ====================== HEALTH CHECK ======================
 app.get("/", (req, res) => {
     res.json({

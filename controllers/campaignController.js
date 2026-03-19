@@ -27,6 +27,7 @@ export const createCampaign = async (req, res) => {
             goalAmount: Number(goalAmount),
             endDate: new Date(endDate),
             fundraiser: req.user._id,
+            verified: false, // explicit to ensure pending visibility
         });
 
         await campaign.save();
@@ -173,11 +174,26 @@ export const addUpdate = async (req, res) => {
             return res.status(403).json({ success: false, message: 'Unauthorized' });
         }
 
+        // ← Your original functionality (unchanged)
         campaign.updates.push({ title, content });
         await campaign.save();
+
+        // === NEW: Feature 9 - Campaign Update Alerts ===
+        const donations = await Donation.find({ campaign: campaign._id }).populate('donor');
+
+        for (const donation of donations) {
+            await createNotification(
+                donation.donor._id,
+                'campaign_update',
+                'New Update from Campaign',
+                `${campaign.title}: ${title}`,
+                campaign._id
+            );
+        }
 
         res.json({ success: true, campaign });
     } catch (err) {
         res.status(400).json({ success: false, message: err.message });
     }
+    
 };

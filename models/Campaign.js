@@ -53,6 +53,20 @@ const campaignSchema = new mongoose.Schema({
         ref: 'User',
         required: true,
     },
+    verified: {
+     type: Boolean,
+     default: false,
+     },
+     fraudScore: {
+      type: Number,
+      default: 0,           // 0-100 (higher = more suspicious)
+        },
+        verifiedBy: {
+           type: mongoose.Schema.Types.ObjectId,
+           ref: 'User',
+            },
+            verifiedAt: Date,
+            rejectionReason: String,
     updates: [{
         title: { type: String, required: true },
         content: { type: String, required: true },
