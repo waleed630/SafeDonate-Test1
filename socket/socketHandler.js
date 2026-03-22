@@ -4,17 +4,26 @@ import Notification from '../models/Notification.js';
 import Campaign from '../models/Campaign.js';
 import Donation from '../models/Donation.js';
 import { sendEmailNotification } from '../services/notificationService.js';   // We'll create this
-
+export let  onlineUsers = new Map();
 const initializeSocket = (io) => {
-  const onlineUsers = new Map(); // userId → socket.id
+  // const onlineUsers = new Map(); // userId → socket.id
 
   io.on("connection", (socket) => {
     console.log(`🔌 User connected: ${socket.id}`);
 
     // ==================== ONLINE USERS TRACKING ====================
-    socket.on("registerOnline", ({ userId }) => {
+    socket.on("registerOnline", (data) => {
+      // Parse if data is a string (from Postman's Socket.io tester)
+      let parsedData = typeof data === 'string' ? JSON.parse(data) : data;
+      const userId = parsedData?.data?.userId || parsedData?.userId;
+      
+      if (!userId) {
+        console.warn("⚠️  registerOnline event received without userId. Data:", data);
+        return;
+      }
       onlineUsers.set(userId.toString(), socket.id);
       io.emit("onlineUsersUpdate", Array.from(onlineUsers.keys()));
+      console.log("✅ User registered online:", userId);
     });
 
     // ==================== CHAT SYSTEM (Existing - Kept 100%) ====================
