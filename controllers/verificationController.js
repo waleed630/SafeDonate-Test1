@@ -11,32 +11,84 @@ const getAIFraudScore = async (description) => {
 
   try {
     const response = await axios.post(
-      "https://api-inference.huggingface.co/models/facebook/bart-large-mnli",
+     
+      "https://router.huggingface.co/hf-inference/models/facebook/bart-large-mnli", 
       {
         inputs: description,
         parameters: {
-          candidate_labels: ["legitimate campaign", "suspicious scam", "fake story", "urgent fraud"]
+          candidate_labels: [
+            "legitimate campaign",
+            "fake story",
+            "suspicious scam",
+            "urgent fraud"
+          ]
         }
       },
       {
         headers: {
           Authorization: `Bearer ${HUGGINGFACE_TOKEN}`,
-        }
+          "Content-Type": "application/json"
+        },
+        timeout: 8000
       }
     );
 
-    const scores = response.data[0];
-    const scamScore = scores.find(s => 
-      s.label.includes("scam") || s.label.includes("fraud")
-    )?.score || 0;
+   const result = response.data;
 
-    return Math.round(scamScore * 100); // 0-100 scale
+// Case 1: HF returns array of {label, score}
+if (Array.isArray(result) && result[0]?.label) {
+  let scamScore = 0;
+
+  result.forEach(item => {
+    if (
+      item.label.toLowerCase().includes("scam") ||
+      item.label.toLowerCase().includes("fraud")
+    ) {
+      scamScore = Math.max(scamScore, item.score || 0);
+    }
+  });
+
+  return Math.round(scamScore * 100);
+}
+
+// Case 2: HF returns {labels: [], scores: []}
+if (result?.labels && result?.scores) {
+  let scamScore = 0;
+
+  result.labels.forEach((label, index) => {
+    if (
+      label.toLowerCase().includes("scam") ||
+      label.toLowerCase().includes("fraud")
+    ) {
+      scamScore = Math.max(scamScore, result.scores[index]);
+    }
+  });
+
+  return Math.round(scamScore * 100);
+}
+
+// Fallback
+console.error("Invalid HF response:", result);
+return 0;
+
+// let scamScore = 0;
+
+// labels.forEach((label, index) => {
+  // if (
+    // label.toLowerCase().includes("scam") ||
+    // label.toLowerCase().includes("fraud")
+  // ) {
+    // scamScore = Math.max(scamScore, scores[index]);
+  // }
+// });
+
+    return Math.round(scamScore * 100);
+
   } catch (err) {
-    logger.warn("HuggingFace AI failed, using rule-based only");
+    console.error("HuggingFace ERROR:", err.response?.data || err.message);
     return 0;
   }
 };
-
 // Combined Fraud Score (Rule-based + AI)
 const calculateFraudScore = async (campaign) => {
   let score = 0;
@@ -104,7 +156,7 @@ const verifyCampaign = async (req, res) => {
   try {
     // This is the cleanest and most reliable query
     const campaigns = await Campaign.find({ 
-      verified: { $ne: true }     // ← This excludes all campaigns where verified = true
+     verified: false    // ← This excludes all campaigns where verified = true
     })
       .populate('fundraiser', 'username email')
       .sort({ createdAt: -1 });
@@ -118,4 +170,64 @@ const verifyCampaign = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
-export { verifyCampaign, getPendingCampaigns,calculateFraudScore,getAIFraudScore };
+ const testFullFraudScore = async (req, res) => {
+  try {
+    const { campaignId } = req.params;
+
+    const campaign = await Campaign.findById(campaignId);
+    if (!campaign) {
+      return res.status(404).json({ success: false, message: "Campaign not found" });
+    }
+    const suspiciousWords = ['urgent', 'help me', 'god bless', 'emergency', 'please help'];
+
+    const fraudScore = await calculateFraudScore(campaign);
+
+    res.json({
+      success: true,
+      campaignId: campaign._id,
+      title: campaign.title,
+      descriptionLength: campaign.description.length,
+      hasImages: campaign.images.length > 0,
+      hasUpdates: campaign.updates.length > 0,
+      fraudScore,
+      breakdown: {
+        rule1_shortDescription: campaign.description.length < 150 ? 30 : 0,
+        rule2_highGoalNoUpdates: (campaign.goalAmount > 50000 && campaign.updates.length === 0) ? 25 : 0,
+        rule3_noImages: campaign.images.length === 0 ? 20 : 0,
+        rule4_suspiciousKeywords: suspiciousWords.some(word => 
+          campaign.description.toLowerCase().includes(word)
+        ) ? 15 : 0,
+        aiScore: await getAIFraudScore(campaign.description)
+      }
+    });
+  } catch (err) {
+    logger.error(err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// Test: Standalone AI fraud score (just pass description text)
+ const testAIFraudScoreOnly = async (req, res) => {
+  try {
+    const { description } = req.body;
+
+    if (!description || typeof description !== 'string' || description.trim() === '') {
+      return res.status(400).json({ success: false, message: "Valid description text is required" });
+    }
+
+    const aiScore = await getAIFraudScore(description);
+
+    res.json({
+      success: true,
+      descriptionLength: description.length,
+      aiScore,
+      interpretation: aiScore > 60 ? "High suspicion (likely scam/fake)" : 
+                      aiScore > 30 ? "Moderate suspicion" : 
+                      "Low suspicion (likely legitimate)"
+    });
+  } catch (err) {
+    logger.error(err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+export { verifyCampaign, getPendingCampaigns, calculateFraudScore, getAIFraudScore, testFullFraudScore, testAIFraudScoreOnly };

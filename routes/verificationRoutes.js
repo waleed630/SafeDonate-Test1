@@ -4,7 +4,10 @@ const router = express.Router();
 
 import {
   verifyCampaign,
-  getPendingCampaigns
+  getPendingCampaigns,
+  testFullFraudScore,
+  testAIFraudScoreOnly
+
 } from '../controllers/verificationController.js';
 
 import protect from '../middleware/authMiddleware.js';
@@ -14,6 +17,10 @@ import restrictTo from '../middleware/role.js';
 router.use(protect, restrictTo('admin'));
 
 router.get('/pending', getPendingCampaigns);
+
+router.post('/test-full-score/:campaignId', testFullFraudScore);
+router.post('/test-ai-score', testAIFraudScoreOnly);
+
 router.post('/:id/verify', verifyCampaign);
 
 export default router;
