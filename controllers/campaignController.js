@@ -52,12 +52,13 @@ export const getCampaigns = async (req, res) => {
       minGoal, 
       maxGoal, 
       minProgress,      // e.g. 50 for 50%+
-      sort              // "newest", "oldest", "popular", "progress"
+      sort,             // "newest", "oldest", "popular", "progress"
+      recommendation = false  // NEW: ?recommendation=true for personalized mode
     } = req.query;
 
     const query = { verified: true };   // Only show verified campaigns
 
-    // 1. Keyword Search (title + description)
+    // 1. Keyword Search (title + description) – PAST FEATURE
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: 'i' } },
@@ -65,22 +66,22 @@ export const getCampaigns = async (req, res) => {
       ];
     }
 
-    // 2. Filter by Category
+    // 2. Filter by Category – PAST FEATURE
     if (category) query.category = category;
 
-    // 3. Filter by Location
+    // 3. Filter by Location – PAST FEATURE
     if (location) query.location = { $regex: location, $options: 'i' };
 
-    // 4. Filter by Target Amount (Goal)
+    // 4. Filter by Target Amount (Goal) – PAST FEATURE
     if (minGoal) query.goalAmount = { ...query.goalAmount, $gte: Number(minGoal) };
     if (maxGoal) query.goalAmount = { ...query.goalAmount, $lte: Number(maxGoal) };
 
-    // Build query
+    // Build base query – PAST FEATURE
     let campaignsQuery = Campaign.find(query)
       .populate('fundraiser', 'username email')
       .select('-__v');
 
-    // 5. Sort Options
+    // 5. Sort Options – PAST FEATURE
     switch (sort) {
       case 'newest':
         campaignsQuery = campaignsQuery.sort({ createdAt: -1 });
@@ -98,21 +99,41 @@ export const getCampaigns = async (req, res) => {
         campaignsQuery = campaignsQuery.sort({ createdAt: -1 });
     }
 
-    const campaigns = await campaignsQuery;
+    let campaigns = await campaignsQuery;
 
-    // 6. Filter by Progress (post-query because it's a virtual field)
+    // 6. Filter by Progress (post-query because it's a virtual field) – PAST FEATURE
     let filteredCampaigns = campaigns;
     if (minProgress) {
       filteredCampaigns = campaigns.filter(c => c.progress >= Number(minProgress));
     }
 
+    // === NEW: Personalized Recommendation Mode (Feature 12) ===
+    if (recommendation === 'true' && req.user) {
+      const user = await User.findById(req.user._id);
+      if (user && user.interests?.length > 0) {
+        // Boost campaigns matching user's interests
+        const interestBoost = filteredCampaigns.filter(c => 
+          user.interests.includes(c.category)
+        );
+
+        // Add fallback: non-matching but popular/recent
+        const fallback = filteredCampaigns
+          .filter(c => !user.interests.includes(c.category))
+          .sort((a, b) => b.donorCount - a.donorCount) // popular first
+          .slice(0, 10); // limit fallback
+
+        filteredCampaigns = [...interestBoost, ...fallback];
+      }
+    }
+
     res.json({
       success: true,
       count: filteredCampaigns.length,
+      recommendationMode: recommendation === 'true',
       campaigns: filteredCampaigns
     });
   } catch (error) {
-    logger.error("Advanced search error:", error);
+    logger.error("Advanced search / recommendation error:", error);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
